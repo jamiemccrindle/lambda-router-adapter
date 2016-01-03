@@ -1,6 +1,6 @@
 {
   "name": "lambda-router-adapter",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Adapts Lambda Router Requests and Responses to NodeJS HTTP Request and Responses",
   "main": "index.js",
   "scripts": {

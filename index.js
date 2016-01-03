@@ -15,7 +15,7 @@ var response = require('./response');
 function newHandler(callback) {
   return function(event, context) {
     var req = request.convert(event);
-    var res = response.newResponse((value) => {
+    var res = response.newResponse(function(value) {
       context.done(null, response.convert(value));
     });
     callback(req, res);
