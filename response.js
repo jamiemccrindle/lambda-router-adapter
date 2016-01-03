@@ -9,6 +9,7 @@ var streams = require('memory-streams');
  *
  * @callback done called when end is called on this response
  *
+ * @class
  * @param done
  * @constructor
  */

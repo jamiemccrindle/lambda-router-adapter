@@ -21,5 +21,11 @@ describe('LambdaRouterAdapter', function() {
     it('should compile', function () {
       require('../response');
     });
+    it('should have funcationing headers', function () {
+      var response = require('../response');
+      var r = response.newResponse(function() {});
+      r.setHeader('test', 'value');
+      assert.equal(r.getHeader('test'), 'value');
+    });
   });
 });
