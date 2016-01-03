@@ -12,13 +12,19 @@ var response = require('./response');
  * @param {httpCallback} callback
  * @returns {Function}
  */
-function newHandler(callback) {
+function newExpressHandler(app) {
+  app.request.__proto__.__proto__ = request.LambdaHttpRequest.prototype;
+  app.response.__proto__.__proto__ = response.LambdaHttpResponse.prototype;
   return function(event, context) {
-    var req = request.convert(event);
-    var res = response.newResponse(function(value) {
-      context.done(null, response.convert(value));
+    var lambdaHttpRequest = request.convert(event);
+    var lambdaHttpResponse = response.newResponse(function(lambdaHttpResponse) {
+      context.done(null, response.convert(lambdaHttpResponse));
     });
-    callback(req, res);
+    app.handle(lambdaHttpRequest, lambdaHttpResponse, function(error) {
+      if(error) {
+        context.done(error);
+      }
+    });
   }
 }
 
@@ -26,5 +32,5 @@ module.exports = {
   convertRequest: request.convert,
   convertResponse: response.convert,
   newResponse: response.newResponse,
-  newHandler: newHandler
+  newExpressHandler: newExpressHandler
 }

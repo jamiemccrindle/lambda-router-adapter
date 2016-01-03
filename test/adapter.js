@@ -1,15 +1,23 @@
 var assert = require('assert');
+var express = require('express');
 describe('LambdaRouterAdapter', function() {
   describe('index', function () {
     it('should compile', function () {
       require('../');
     });
-    it('should end', function (done) {
+    it('should handle an express request', function (done) {
       var index = require('../');
-      index.newHandler(function(req, res) {
-        res.end();
+      var app = express();
+
+      app.get('/status', function(req, res){
+        res.send('OK');
+      });
+
+      index.newExpressHandler(app)({url: '/status', method: 'GET'}, {done: function(error, lambdaResponse) {
+        assert.ifError(error);
+        assert.equal('OK', new Buffer(lambdaResponse.bodyBase64, 'base64').toString());
         done();
-      })({url: '/test'}, {done: function() {}});
+      }});
     });
   });
   describe('request', function () {
@@ -21,7 +29,7 @@ describe('LambdaRouterAdapter', function() {
     it('should compile', function () {
       require('../response');
     });
-    it('should have funcationing headers', function () {
+    it('should have functioning headers', function () {
       var response = require('../response');
       var r = response.newResponse(function() {});
       r.setHeader('test', 'value');

@@ -56,8 +56,10 @@ LambdaHttpResponse.prototype.writeHead = function(statusCode, reason, obj) {
   }
 }
 LambdaHttpResponse.prototype.end = function(data, encoding, callback) {
-  LambdaHttpResponse.super_.prototype.end.apply(this, data, encoding, callback);
-  this.done(this);
+  LambdaHttpResponse.super_.prototype.end.apply(this, arguments);
+  if(this.done) {
+    this.done(this);
+  }
 }
 
 /**

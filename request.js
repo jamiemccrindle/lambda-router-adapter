@@ -4,6 +4,11 @@ var url = require('url');
 var util = require('util');
 var streams = require('memory-streams');
 
+function LambdaSocket() {
+
+}
+LambdaSocket.prototype.destroy = function() {}
+
 /**
  * Converts a Lambda Event to a NodeJS Http Request.
  *
@@ -24,8 +29,9 @@ function LambdaHttpRequest(lambdaRequest) {
   this.originalUrl = lambdaRequest.url;
   this.path = url.parse(lambdaRequest.url).pathname;
 
-  this.headers = lambdaRequest.headers;
+  this.headers = lambdaRequest.headers || {};
   this.body = lambdaRequest.body;
+  this.socket = new LambdaSocket();
 }
 
 LambdaHttpRequest.prototype.setTimeout = function(msecs, callback) { }
@@ -37,4 +43,7 @@ function convert(lambdaRequest) {
   return new LambdaHttpRequest(lambdaRequest);
 }
 
-module.exports.convert = convert;
+module.exports = {
+  convert: convert,
+  LambdaHttpRequest: LambdaHttpRequest
+}
