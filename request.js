@@ -4,30 +4,37 @@ var url = require('url');
 var util = require('util');
 var streams = require('memory-streams');
 
+/**
+ * Converts a Lambda Event to a NodeJS Http Request.
+ *
+ * @param {{ body: string, method: string, headers: Object.<string,string>, url: string}} lambdaRequest
+ * @constructor
+ */
+function LambdaHttpRequest(lambdaRequest) {
+  streams.ReadableStream.call(this, lambdaRequest.body);
+  this.httpVersionMajor = 1;
+  this.httpVersionMinor = 1;
+  this.httpVersion = 1.1;
+  this.complete = false;
+  this.trailers = {};
+  this.readable = true;
+
+  this.method = lambdaRequest.method;
+  this.url = lambdaRequest.url;
+  this.originalUrl = lambdaRequest.url;
+  this.path = url.parse(lambdaRequest.url).pathname;
+
+  this.headers = lambdaRequest.headers;
+  this.body = lambdaRequest.body;
+}
+
+LambdaHttpRequest.prototype.setTimeout = function(msecs, callback) { }
+LambdaHttpRequest.prototype.done = function(error) { }
+
+util.inherits(LambdaHttpRequest, streams.ReadableStream);
+
 function convert(lambdaRequest) {
-
-  var httpRequest = new streams.ReadableStream(lambdaRequest.body);
-
-  httpRequest.httpVersionMajor = 1;
-  httpRequest.httpVersionMinor = 1;
-  httpRequest.httpVersion = 1.1;
-  httpRequest.complete = false;
-  httpRequest.trailers = {};
-  httpRequest.readable = true;
-
-  httpRequest.method = lambdaRequest.method;
-  httpRequest.url = lambdaRequest.url;
-  httpRequest.originalUrl = lambdaRequest.url;
-  httpRequest.path = url.parse(lambdaRequest.url).pathname;
-
-  httpRequest.headers = lambdaRequest.headers;
-  httpRequest.body = lambdaRequest.body;
-
-  httpRequest.setTimeout = function(msecs, callback) { }
-  httpRequest.destroy = function() { }
-
-  return httpRequest;
-
+  return new LambdaHttpRequest(lambdaRequest);
 }
 
 module.exports.convert = convert;

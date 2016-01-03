@@ -3,48 +3,76 @@
 var util = require('util');
 var streams = require('memory-streams');
 
-function newResponse() {
-
-  var httpResponse = new streams.WritableStream();
-
-  httpResponse.headers = {};
-  httpResponse.headersSet = false;
-  httpResponse.statusCode = 200;
-  httpResponse.statusMessage = undefined;
-  httpResponse.setTimeout = function setTimeout(msecs, callback) {}
-  httpResponse.destroy = function destroy(error) {}
-  httpResponse.setHeader = function(name, value) {
-    httpResponse.headers[name] = value;
-  }
-  httpResponse.getHeader = function(name) {
-    return httpResponse.headers[name];
-  }
-  httpResponse.removeHeader = function(name) {
-    delete httpResponse.headers[name];
-  }
-  httpResponse.flushHeaders = function() { }
-  httpResponse.writeHead = function(statusCode, reason, obj) {
-    if (typeof reason === 'string') {
-      // writeHead(statusCode, reasonPhrase[, headers])
-      this.statusMessage = reason;
-    } else {
-      // writeHead(statusCode[, headers])
-      this.statusMessage =
-        this.statusMessage || STATUS_CODES[statusCode] || 'unknown';
-      obj = reason;
-    }
-    this.statusCode = statusCode;
-    if (obj) {
-      var keys = Object.keys(obj);
-      for (var i = 0; i < keys.length; i++) {
-        var k = keys[i];
-        if (k) httpResponse.setHeader(k, obj[k]);
-      }
-    }
-  }
-  return httpResponse;
+/**
+ * An in memory HTTP Response that captures any data written to it
+ * so that it can be easily serialised into a lambda payload
+ *
+ * @callback done called when end is called on this response
+ *
+ * @param done
+ * @constructor
+ */
+function LambdaHttpResponse(done) {
+  streams.WritableStream.call(this);
+  this.done = done;
+  this.headers = {};
+  this.headersSet = false;
+  this.statusCode = 200;
+  this.statusMessage = undefined;
 }
 
+util.inherits(LambdaHttpResponse, streams.WritableStream);
+
+LambdaHttpResponse.prototype.setTimeout = function(msecs, callback) {}
+LambdaHttpResponse.prototype.destroy = function(error) {}
+LambdaHttpResponse.prototype.setHeader = function(name, value) {
+  this.headers[name] = value;
+}
+LambdaHttpResponse.prototype.getHeader = function(name) {
+  return this.headers[name];
+}
+LambdaHttpResponse.prototype.removeHeader = function(name) {
+  delete this.headers[name]
+}
+LambdaHttpResponse.prototype.flushHeaders = function() {}
+LambdaHttpResponse.prototype.writeHead = function(statusCode, reason, obj) {
+  if (typeof reason === 'string') {
+    // writeHead(statusCode, reasonPhrase[, headers])
+    this.statusMessage = reason;
+  } else {
+    // writeHead(statusCode[, headers])
+    this.statusMessage =
+      this.statusMessage || '';
+    obj = reason;
+  }
+  this.statusCode = statusCode;
+  if (obj) {
+    var keys = Object.keys(obj);
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      if (k) this.setHeader(k, obj[k]);
+    }
+  }
+}
+LambdaHttpResponse.prototype.end = function(data, encoding, callback) {
+  LambdaHttpResponse.super_.prototype.end.apply(this, data, encoding, callback);
+  this.done(this);
+}
+
+/**
+ * @callback done called when end is called on this response
+ * @param done
+ * @returns {LambdaHttpResponse}
+ */
+function newResponse(done) {
+  return new LambdaHttpResponse(done);
+}
+
+/**
+ * Serialises a LambdaHttpResponse
+ * @param {LambdaHttpResponse} httpResponse
+ * @returns {{headers: Object.<string, string>, statusCode: number, bodyBase64: string}}
+ */
 function convert(httpResponse) {
   var lambdaResponse = {
     headers: httpResponse.headers,
@@ -59,5 +87,6 @@ function convert(httpResponse) {
 
 module.exports = {
   newResponse: newResponse,
+  LambdaHttpResponse: LambdaHttpResponse,
   convert: convert
 }
