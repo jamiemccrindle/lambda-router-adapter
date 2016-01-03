@@ -1,7 +1,7 @@
 {
   "name": "lambda-router-adapter",
-  "version": "1.0.2",
-  "description": "",
+  "version": "1.0.3",
+  "description": "Adapts Lambda Router Requests and Responses to NodeJS HTTP Request and Responses",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
