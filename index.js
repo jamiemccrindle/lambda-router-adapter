@@ -1,5 +1,5 @@
-var request = require('request');
-var response = require('response');
+var request = require('./request');
+var response = require('./response');
 
 /**
  * This callback is displayed as part of the Requester class.
