@@ -3,14 +3,14 @@
 Adapts Lambda Router Requests and Responses to NodeJS HTTP Request and Responses.
 This is a utility library for implementing AWS Lambda functions that receive
 events from the
-[http://github.com/jamiemccrindle/lambda-router](github.com/jamiemccrindle/lambda-router)
+[github.com/jamiemccrindle/lambda-router](http://github.com/jamiemccrindle/lambda-router)
 project.
 
 ## Usage
 
 ### Express 4.x
 
-lambda-router-adapter has built in support fore express 4.x.
+lambda-router-adapter has built in support for express 4.x.
 Use the newExpressHandler method to convert an express app into a lambda
 handler.
 
