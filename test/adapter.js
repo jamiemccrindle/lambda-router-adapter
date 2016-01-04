@@ -54,4 +54,14 @@ describe('LambdaRouterAdapter', function() {
       assert.equal(r.getHeader('test'), 'value');
     });
   });
+  describe('contentTypes', function () {
+    it('should compile', function () {
+      require('../contentTypes');
+    });
+    it('should detect a text content type', function () {
+      var contentTypes = require('../contentTypes');
+      assert(contentTypes.isText('text/plain'));
+      assert(!contentTypes.isText('application/octetstream'));
+    });
+  });
 });

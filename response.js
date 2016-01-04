@@ -2,6 +2,7 @@
 
 var util = require('util');
 var streams = require('memory-streams');
+var contentTypes = require('./contentTypes');
 
 /**
  * An in memory HTTP Response that captures any data written to it
@@ -79,9 +80,14 @@ function newResponse(done) {
 function convert(httpResponse) {
   var lambdaResponse = {
     headers: httpResponse.headers,
-    statusCode: httpResponse.statusCode,
-    bodyBase64: httpResponse.toBuffer().toString('base64')
+    statusCode: httpResponse.statusCode
   };
+  var contentTypeHeader = httpResponse.headers['content-type'];
+  if(contentTypeHeader && contentTypes.isText(contentTypeHeader)) {
+    lambdaResponse.body = httpResponse.toBuffer().toString();
+  } else {
+    lambdaResponse.bodyBase64 = httpResponse.toBuffer().toString('base64');
+  }
   if(httpResponse.statusMessage) {
     lambdaResponse.statusMessage = httpResponse.statusMessage;
   }
