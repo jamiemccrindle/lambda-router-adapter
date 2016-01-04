@@ -36,8 +36,7 @@ The lambda event must have the following fields:
 * url
 * method
 
-
- The lambda event could have the following fields:
+The lambda event could have the following fields:
 
 * body
 * headers
