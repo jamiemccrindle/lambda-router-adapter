@@ -82,7 +82,7 @@ function convert(httpResponse) {
     headers: httpResponse.headers,
     statusCode: httpResponse.statusCode
   };
-  var contentTypeHeader = httpResponse.headers['content-type'];
+  var contentTypeHeader = httpResponse.headers['Content-Type'];
   if(contentTypeHeader && contentTypes.isText(contentTypeHeader)) {
     lambdaResponse.body = httpResponse.toBuffer().toString();
   } else {
