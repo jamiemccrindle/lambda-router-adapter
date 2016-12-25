@@ -24,10 +24,10 @@ function LambdaHttpRequest(lambdaRequest) {
   this.trailers = {};
   this.readable = true;
 
-  this.method = lambdaRequest.method;
-  this.url = lambdaRequest.url;
-  this.originalUrl = lambdaRequest.url;
-  this.path = url.parse(lambdaRequest.url).pathname;
+  this.method = lambdaRequest.method || lambdaRequest.httpMethod;
+  this.url = lambdaRequest.url || lambdaRequest.path;
+  this.originalUrl = lambdaRequest.url || lambdaRequest.path;
+  this.path = url.parse(lambdaRequest.url || lambdaRequest.path).pathname;
 
   this.headers = lambdaRequest.headers || {};
   this.body = lambdaRequest.body;
