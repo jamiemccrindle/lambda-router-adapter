@@ -19,7 +19,7 @@ function LambdaHttpRequest(lambdaRequest) {
   streams.ReadableStream.call(this, lambdaRequest.body);
   this.httpVersionMajor = 1;
   this.httpVersionMinor = 1;
-  this.httpVersion = 1.1;
+  this.httpVersion = '1.1';
   this.complete = false;
   this.trailers = {};
   this.readable = true;
